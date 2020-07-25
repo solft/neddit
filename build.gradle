@@ -1,0 +1,70 @@
+plugins {
+    id 'org.springframework.boot' version '2.3.2.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+    id 'java'
+}
+
+group = 'com.hansol'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'com.querydsl:querydsl-jpa:4.3.1'
+    implementation 'com.querydsl:querydsl-apt:4.3.1'
+//    implementation 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final'
+
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'com.querydsl:querydsl-apt:4.3.1:jpa'
+//    annotationProcessor 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation 'io.projectreactor:reactor-test'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+def generated = "src/main/generated"
+
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file(generated)
+}
+
+clean.doLast {
+    file(generated).deleteDir()
+}
+
+ext.profile = (!project.hasProperty('profile') || !profile) ? 'dev' : profile
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ["src/main/java", generated]
+        }
+        resources {
+            srcDirs = ["src/main/resources", "src/main/resources-env/${profile}"]
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}

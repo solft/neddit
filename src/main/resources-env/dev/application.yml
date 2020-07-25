@@ -1,0 +1,12 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+  datasource:
+    hikari:
+      jdbc-url: jdbc:postgresql://localhost:5432/neddit
+      username: nedditer
+      password: nedditer
+      driver-class-name: org.postgresql.Driver
